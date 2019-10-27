@@ -7,18 +7,68 @@
 
 using namespace std;
 
+struct DaneUzytkownika
+{
+    int idUzytkownika;
+    string nazwa, haslo;
+};
+
 struct DaneAdresata
 {
-    int id;
+    int idAdresata;
     string imie, nazwisko, adres, telefon, email;
 };
 
-void wczytajSegmentZLiniiTekstu (vector <DaneAdresata> &adresaci, int liczbaAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
+void wczytajSegmentZLiniiTekstuSpisuUzytkownikow (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow, string segmentDanychUzytkownika, int numerSegmentuWLiniiTekstu)
 {
     switch (numerSegmentuWLiniiTekstu)
     {
     case 1:
-        adresaci[liczbaAdresatow].id = atoi(segmentDanychAdresata.c_str());
+        uzytkownicy[liczbaUzytkownikow].idUzytkownika = atoi(segmentDanychUzytkownika.c_str());
+        break;
+    case 2:
+        uzytkownicy[liczbaUzytkownikow].nazwa = segmentDanychUzytkownika;
+        break;
+    case 3:
+        uzytkownicy[liczbaUzytkownikow].haslo = segmentDanychUzytkownika;
+        break;
+    }
+}
+
+int wczytajUzytkownikowZPliku (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+{
+    fstream listaUzytkownikow;
+    string liniaTekstuSpisuUzytkownikow;
+
+    listaUzytkownikow.open ("Uzytkownicy.txt", ios::in);
+    if (listaUzytkownikow.good() == true)
+    {
+        while (getline(listaUzytkownikow,liniaTekstuSpisuUzytkownikow))
+        {
+            uzytkownicy.push_back(DaneUzytkownika());
+            stringstream ss (liniaTekstuSpisuUzytkownikow);
+            string segmentDanychUzytkownika;
+            int numerSegmentuWLiniiTekstu = 1;
+
+            while (getline(ss, segmentDanychUzytkownika, '|'))
+            {
+                wczytajSegmentZLiniiTekstuSpisuUzytkownikow (uzytkownicy, liczbaUzytkownikow, segmentDanychUzytkownika, numerSegmentuWLiniiTekstu);
+                numerSegmentuWLiniiTekstu ++;
+            }
+            liczbaUzytkownikow ++;
+        }
+    }
+    listaUzytkownikow.close();
+
+    return liczbaUzytkownikow;
+}
+
+void wczytajSegmentZLiniiTekstuSpisuAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
+{
+    switch (numerSegmentuWLiniiTekstu)
+    {
+    case 1:
+        adresaci[liczbaAdresatow].idAdresata = atoi(segmentDanychAdresata.c_str());
         break;
     case 2:
         adresaci[liczbaAdresatow].imie = segmentDanychAdresata;
@@ -41,21 +91,21 @@ void wczytajSegmentZLiniiTekstu (vector <DaneAdresata> &adresaci, int liczbaAdre
 int wczytajAdresatowZPliku (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
 {
     fstream ksiazkaAdresowa;
-    string liniaTekstu;
+    string liniaTekstuSpisuAdresatow;
 
-    ksiazkaAdresowa.open ("ksiazkaAdresowa_nowy_format.txt", ios::in);
+    ksiazkaAdresowa.open ("Adresaci.txt", ios::in);
     if (ksiazkaAdresowa.good() == true)
     {
-        while (getline(ksiazkaAdresowa,liniaTekstu))
+        while (getline(ksiazkaAdresowa,liniaTekstuSpisuAdresatow))
         {
             adresaci.push_back(DaneAdresata());
-            stringstream ss (liniaTekstu);
+            stringstream ss (liniaTekstuSpisuAdresatow);
             string segmentDanychAdresata;
             int numerSegmentuWLiniiTekstu = 1;
 
             while (getline(ss, segmentDanychAdresata, '|'))
             {
-                wczytajSegmentZLiniiTekstu (adresaci, liczbaAdresatow, segmentDanychAdresata, numerSegmentuWLiniiTekstu);
+                wczytajSegmentZLiniiTekstuSpisuAdresatow (adresaci, liczbaAdresatow, segmentDanychAdresata, numerSegmentuWLiniiTekstu);
                 numerSegmentuWLiniiTekstu ++;
             }
             liczbaAdresatow ++;
@@ -69,7 +119,7 @@ int wczytajAdresatowZPliku (vector <DaneAdresata> &adresaci, int liczbaAdresatow
 void wyczyscPlikTekstowy ()
 {
     fstream ksiazkaAdresowa;
-    ksiazkaAdresowa.open("ksiazkaAdresowa_nowy_format.txt", ios::out|ios::trunc);
+    ksiazkaAdresowa.open("Adresaci.txt", ios::out|ios::trunc);
     ksiazkaAdresowa.close();
 }
 
@@ -77,12 +127,12 @@ void zapiszAdresatowWPliku (vector <DaneAdresata> &adresaci, int liczbaAdresatow
 {
     fstream ksiazkaAdresowa;
 
-    ksiazkaAdresowa.open("ksiazkaAdresowa_nowy_format.txt", ios::out|ios::app);
+    ksiazkaAdresowa.open("Adresaci.txt", ios::out|ios::app);
     if (ksiazkaAdresowa.good() == true)
     {
         for (int i=0; i<liczbaAdresatow; i++)
         {
-            ksiazkaAdresowa << adresaci[i].id << '|';
+            ksiazkaAdresowa << adresaci[i].idAdresata << '|';
             ksiazkaAdresowa << adresaci[i].imie << '|';
             ksiazkaAdresowa << adresaci[i].nazwisko << '|';
             ksiazkaAdresowa << adresaci[i].adres << '|';
@@ -113,7 +163,7 @@ int wyznaczIDNowegoAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresato
     if (liczbaAdresatow == 0)
         return IDPierwszegoWpisu;
     else
-        return (adresaci[liczbaAdresatow-1].id + inkrementacjaID);
+        return (adresaci[liczbaAdresatow-1].idAdresata + inkrementacjaID);
 }
 
 int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
@@ -145,7 +195,7 @@ int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow
     adresaci[indeksNowegoAdresata].adres = adres;
     adresaci[indeksNowegoAdresata].telefon = telefon;
     adresaci[indeksNowegoAdresata].email = email;
-    adresaci[indeksNowegoAdresata].id = IDNowegoAdresata;
+    adresaci[indeksNowegoAdresata].idAdresata = IDNowegoAdresata;
     liczbaAdresatow++;
 
     wyczyscPlikTekstowy ();
@@ -158,7 +208,7 @@ int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow
 
 void wyswietlDaneAdresata (vector <DaneAdresata> &adresaci, int i)
 {
-    cout << "NUMER ID WPISU: " << adresaci[i].id << endl;
+    cout << "NUMER ID WPISU: " << adresaci[i].idAdresata << endl;
     cout << "IMI¨: " << adresaci[i].imie << endl;
     cout << "NAZWISKO: " << adresaci[i].nazwisko << endl;
     cout << "ADRES: " << adresaci[i].adres << endl;
@@ -193,7 +243,7 @@ int wyszukajID (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int IDAdre
 
     for (int i=0; i<liczbaAdresatow; i++)
     {
-        if (IDAdresata == adresaci[i].id)
+        if (IDAdresata == adresaci[i].idAdresata)
         {
             indeksWyszukanegoAdresata = i;
             liczbaWynikow ++;
@@ -361,11 +411,11 @@ int edytujWybranegoAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresato
 
 int usunWybranegoAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int indeksWyszukanegoAdresata)
 {
-    int IDAdresataDoUsuniecia = adresaci[indeksWyszukanegoAdresata].id;
+    int IDAdresataDoUsuniecia = adresaci[indeksWyszukanegoAdresata].idAdresata;
 
     for (vector <DaneAdresata>::iterator it = adresaci.begin(); it != adresaci.end(); it++)
     {
-        if (it->id == IDAdresataDoUsuniecia)
+        if (it->idAdresata == IDAdresataDoUsuniecia)
         {
             it = adresaci.erase(it);
             liczbaAdresatow--;
@@ -436,7 +486,19 @@ int modyfikujDaneAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow,
     return liczbaAdresatow;
 }
 
-void wyswietlMenuProgramu ()
+void wyswietlMenuStartowe ()
+{
+    system("cls");
+    cout << "**********************************" << endl;
+    cout << "*        KSI¤KA ADRESOWA        *" << endl;
+    cout << "**********************************" << endl << endl;
+    cout << "1. Logowanie" << endl;
+    cout << "2. Rejestracja" << endl;
+    cout << "3. Zakoäcz program" << endl;
+    cout << endl;
+}
+
+void wyswietlMenuZAdresatami ()
 {
     system("cls");
     cout << "**********************************" << endl;
@@ -448,11 +510,67 @@ void wyswietlMenuProgramu ()
     cout << "4. Lista zapisanych adresat¢w" << endl;
     cout << "5. Usuä adresata" << endl;
     cout << "6. Edytuj dane adresata" << endl;
-    cout << "9. Zakoäcz program" << endl;
+    cout << "7. Zmieä hasˆo" << endl;
+    cout << "8. Zakoäcz program" << endl;
     cout << endl;
 }
 
-int main()
+int zalogujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+{
+    int idUzytkownika;
+
+
+    return idUzytkownika;
+}
+
+int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+{
+
+
+
+
+    return liczbaUzytkownikow;
+}
+
+int uruchomObslugeUzytkownikow ()
+{
+    vector <DaneUzytkownika> uzytkownicy;
+    int liczbaUzytkownikow = 0;
+    char wybranyZnak;
+
+    liczbaUzytkownikow = wczytajUzytkownikowZPliku (uzytkownicy, liczbaUzytkownikow);
+
+    do
+    {
+        wyswietlMenuStartowe ();
+
+        cin.clear();
+        cin.sync();
+        wybranyZnak = getch();
+
+        switch (wybranyZnak)
+        {
+        case '1':
+            return zalogujUzytkownika (uzytkownicy, liczbaUzytkownikow);
+            break;
+        case '2':
+            liczbaUzytkownikow = zarejestrujUzytkownika (uzytkownicy, liczbaUzytkownikow);
+            break;
+        case '3':
+            // wyczyscPlikTekstowy ();
+            // zapiszAdresatowWPliku (adresaci, liczbaAdresatow);
+            cout << " * Zapisano w pliku tekstowym! *" << endl;
+            Sleep(1500);
+            exit (0);
+        default:
+            cout << "Nie ma takiej opcji w menu!";
+            Sleep(1500);
+        }
+    }
+    while (wybranyZnak !=3);
+}
+
+void uruchomKsiazkeAdresowa (int idZalogowanegoUzytkownika)
 {
     vector <DaneAdresata> adresaci;
     int liczbaAdresatow = 0;
@@ -462,7 +580,7 @@ int main()
 
     do
     {
-        wyswietlMenuProgramu ();
+        wyswietlMenuZAdresatami ();
 
         cin.clear();
         cin.sync();
@@ -485,18 +603,34 @@ int main()
         case '6':
             liczbaAdresatow = modyfikujDaneAdresata (adresaci, liczbaAdresatow, wybranyZnak);
             break;
-        case '9':
+        case '7':
+            // zmien haslo
+            break;
+        case '8':
             wyczyscPlikTekstowy ();
             zapiszAdresatowWPliku (adresaci, liczbaAdresatow);
             cout << " * Zapisano w pliku tekstowym! *" << endl;
             Sleep(1500);
-            exit (0);
+            idZalogowanegoUzytkownika = 0;
         default:
             cout << "Nie ma takiej opcji w menu!";
             Sleep(1500);
         }
     }
-    while (wybranyZnak != 9);
+    while (wybranyZnak != 8);
+}
 
+int main ()
+{
+    int idZalogowanegoUzytkownika = 0;
+
+    while(1)
+    {
+        if (idZalogowanegoUzytkownika == 0)
+            idZalogowanegoUzytkownika = uruchomObslugeUzytkownikow ();
+        else
+            uruchomKsiazkeAdresowa (idZalogowanegoUzytkownika);
+    }
     return 0;
 }
+
