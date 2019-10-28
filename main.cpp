@@ -19,6 +19,64 @@ struct DaneAdresata
     string imie, nazwisko, adres, telefon, email;
 };
 
+void wyswietlHeaderMenu ()
+{
+    cout << "**********************************" << endl;
+    cout << "*        KSI¤½KA ADRESOWA        *" << endl;
+    cout << "**********************************" << endl << endl;
+}
+
+void wyswietlMenuStartowe ()
+{
+    system("cls");
+    wyswietlHeaderMenu ();
+    cout << "1. Logowanie" << endl;
+    cout << "2. Rejestracja" << endl;
+    cout << "3. Zakoäcz program" << endl;
+    cout << endl;
+}
+
+void wyswietlMenuZAdresatami ()
+{
+    system("cls");
+    wyswietlHeaderMenu ();
+    cout << "1. Dodaj nowego adresata" << endl;
+    cout << "2. Wyszukaj adresata po imieniu" << endl;
+    cout << "3. Wyszukaj adresata po nazwisku" << endl;
+    cout << "4. Lista zapisanych adresat¢w" << endl;
+    cout << "5. Usuä adresata" << endl;
+    cout << "6. Edytuj dane adresata" << endl;
+    cout << "7. Zmieä hasˆo" << endl;
+    cout << "8. Wyloguj" << endl;
+    cout << endl;
+}
+
+void wyswietlDaneAdresata (vector <DaneAdresata> &adresaci, int i)
+{
+    cout << "NUMER ID WPISU: " << adresaci[i].idAdresata << endl;
+    cout << "IMI¨: " << adresaci[i].imie << endl;
+    cout << "NAZWISKO: " << adresaci[i].nazwisko << endl;
+    cout << "ADRES: " << adresaci[i].adres << endl;
+    cout << "TELEFON: " << adresaci[i].telefon << endl;
+    cout << "E-MAIL: " << adresaci[i].email << endl << endl;
+}
+
+void wyswietlMenuEdycji (vector <DaneAdresata> &adresaci, int indeksWyszukanegoAdresata)
+{
+    system("cls");
+    wyswietlHeaderMenu();
+    cout << "Aktualne dane wybranego adresata: " << endl << endl;
+    wyswietlDaneAdresata (adresaci, indeksWyszukanegoAdresata);
+
+    cout << "Wybierz pole do edycji: " << endl;
+    cout << "1. IMI¨" << endl;
+    cout << "2. NAZWISKO" << endl;
+    cout << "3. ADRES" << endl;
+    cout << "4. TELEFON" << endl;
+    cout << "5. E-MAIL" << endl;
+    cout << "6. Cofnij do menu gˆ¢wnego" << endl << endl;
+}
+
 void wczytajSegmentZLiniiTekstuSpisuUzytkownikow (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow, string segmentDanychUzytkownika, int numerSegmentuWLiniiTekstu)
 {
     switch (numerSegmentuWLiniiTekstu)
@@ -147,7 +205,7 @@ void zapiszUzytkownikowWPliku (vector <DaneUzytkownika> &uzytkownicy, int liczba
     }
     else
     {
-        cout << "Nie udaÅ‚o siÄ™ otworzyÄ‡ pliku i zapisaÄ‡ danych!" << endl;
+        cout << "Nie udaˆo si© otworzy† pliku i zapisa† danych!" << endl;
         system("pause");
     }
 }
@@ -172,7 +230,7 @@ void zapiszAdresatowWPliku (vector <DaneAdresata> &adresaci, int liczbaAdresatow
     }
     else
     {
-        cout << "Nie udaÅ‚o siÄ™ otworzyÄ‡ pliku i zapisaÄ‡ danych!" << endl;
+        cout << "Nie udaˆo si© otworzy† pliku i zapisa† danych!" << endl;
         system("pause");
     }
 }
@@ -201,7 +259,7 @@ int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow
     int indeksNowegoAdresata = 0;
     int IDNowegoAdresata;
 
-    cout << "Wpisz imiÄ™ adresata: ";
+    cout << "Wpisz imi© adresata: ";
     cin.sync();
     getline(cin,imie);
     cout << "Wpisz nazwisko adresata: ";
@@ -229,32 +287,22 @@ int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow
 
     wyczyscPlikTekstowyZAdresatami ();
     zapiszAdresatowWPliku (adresaci, liczbaAdresatow);
-    cout << endl << "Zapisano" << endl;
+    cout << endl << "Zapisano." << endl;
     Sleep(1000);
 
     return liczbaAdresatow;
-}
-
-void wyswietlDaneAdresata (vector <DaneAdresata> &adresaci, int i)
-{
-    cout << "NUMER ID WPISU: " << adresaci[i].idAdresata << endl;
-    cout << "IMIÄ˜: " << adresaci[i].imie << endl;
-    cout << "NAZWISKO: " << adresaci[i].nazwisko << endl;
-    cout << "ADRES: " << adresaci[i].adres << endl;
-    cout << "TELEFON: " << adresaci[i].telefon << endl;
-    cout << "E-MAIL: " << adresaci[i].email << endl << endl;
 }
 
 void wyswietlWszystkichAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
 {
     if (liczbaAdresatow == 0)
     {
-        cout << "KsiÄ…Å¼ka adresowa jest pusta." << endl << endl;
+        cout << "Ksi¥¾ka adresowa jest pusta." << endl << endl;
         system("pause");
     }
     else
     {
-        cout << "Liczba adresatÃ³w zapisanych w ksiÄ…Å¼ce adresowej: " << liczbaAdresatow << endl << endl;
+        cout << "Liczba adresat¢w zapisanych w ksi¥¾ce adresowej: " << liczbaAdresatow << endl << endl;
 
         for (int i=0; i<liczbaAdresatow; i++)
         {
@@ -281,7 +329,7 @@ int wyszukajID (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int IDAdre
 
     if (liczbaWynikow == 0)
     {
-        cout << endl << "Nie znaleziono Å¼adnych adresatÃ³w." << endl << endl;
+        cout << endl << "Nie znaleziono ¾adnych adresat¢w." << endl << endl;
         system("pause");
         return NIE_ZNALEZIONO_WYNIKOW;
     }
@@ -294,7 +342,7 @@ void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
     string szukaneImie;
     int liczbaWynikow = 0;
 
-    cout << "Wpisz imiÄ™ do wyszukania: ";
+    cout << "Wpisz imi© do wyszukania: ";
     cin.sync();
     getline(cin,szukaneImie);
 
@@ -305,11 +353,11 @@ void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
     }
 
     if (liczbaWynikow == 0)
-        cout << endl << "Nie znaleziono Å¼adnych adresatÃ³w." << endl << endl;
+        cout << endl << "Nie znaleziono ¾adnych adresat¢w." << endl << endl;
 
     else
     {
-        cout << endl << "Znaleziono " << liczbaWynikow << " adresatÃ³w w ksiÄ…Å¼ce:" << endl << endl;
+        cout << endl << "Znaleziono " << liczbaWynikow << " adresat¢w w ksi¥¾ce:" << endl << endl;
         for (int i=0; i<liczbaAdresatow; i++)
         {
             if (szukaneImie == adresaci[i].imie)
@@ -335,11 +383,11 @@ void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
     }
 
     if (liczbaWynikow == 0)
-        cout << endl << "Nie znaleziono Å¼adnych adresatÃ³w." << endl << endl;
+        cout << endl << "Nie znaleziono ¾adnych adresat¢w." << endl << endl;
 
     else
     {
-        cout << endl << "Znaleziono " << liczbaWynikow << " adresatÃ³w w ksiÄ…Å¼ce:" << endl << endl;
+        cout << endl << "Znaleziono " << liczbaWynikow << " adresat¢w w ksi¥¾ce:" << endl << endl;
         for (int i=0; i<liczbaAdresatow; i++)
         {
             if (szukaneNazwisko == adresaci[i].nazwisko)
@@ -347,22 +395,6 @@ void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
         }
     }
     system("pause");
-}
-
-void wyswietlMenuEdycji (vector <DaneAdresata> &adresaci, int indeksWyszukanegoAdresata)
-{
-    system("cls");
-
-    cout << "Aktualne dane wybranego adresata: " << endl << endl;
-    wyswietlDaneAdresata (adresaci, indeksWyszukanegoAdresata);
-
-    cout << "Wybierz pole do edycji: " << endl;
-    cout << "1. IMIÄ˜" << endl;
-    cout << "2. NAZWISKO" << endl;
-    cout << "3. ADRES" << endl;
-    cout << "4. TELEFON" << endl;
-    cout << "5. E-MAIL" << endl;
-    cout << "6. Cofnij do menu gÅ‚Ã³wnego" << endl << endl;
 }
 
 void edytujWybranePole (vector <DaneAdresata> &adresaci, int indeksWyszukanegoAdresata, char wybranyZnakWMenuEdycji, int liczbaAdresatow)
@@ -374,7 +406,7 @@ void edytujWybranePole (vector <DaneAdresata> &adresaci, int indeksWyszukanegoAd
 
     if (wybranyZnakWMenuEdycji == '1')
     {
-        cout << "Wpisz nowe imiÄ™ adresata: ";
+        cout << "Wpisz nowe imi© adresata: ";
         getline(cin,nowaWartoscPola);
         adresaci[indeksWyszukanegoAdresata].imie = nowaWartoscPola;
     }
@@ -404,7 +436,7 @@ void edytujWybranePole (vector <DaneAdresata> &adresaci, int indeksWyszukanegoAd
     }
     wyczyscPlikTekstowyZAdresatami ();
     zapiszAdresatowWPliku (adresaci, liczbaAdresatow);
-    cout << endl << "Zapisano" << endl;
+    cout << endl << "Zapisano." << endl;
     Sleep(1000);
 }
 
@@ -432,7 +464,7 @@ int edytujWybranegoAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresato
             return liczbaAdresatow;
         default:
             cout << "Nie ma takiej opcji w menu!";
-            Sleep(1500);
+            Sleep(1000);
         }
     }
     while (wybranyZnakWMenuEdycji != '6');
@@ -461,9 +493,10 @@ int potwierdzUsuniecieAdresata (vector <DaneAdresata> &adresaci, int liczbaAdres
     do
     {
         system("cls");
+        wyswietlHeaderMenu();
         cout << "Aktualne dane wybranego adresata: " << endl << endl;
         wyswietlDaneAdresata (adresaci, indeksWyszukanegoAdresata);
-        cout << "UsunÄ…Ä‡ wybranego adresata z ksiÄ…Å¼ki?" << endl << endl;
+        cout << "Usun¥† wybranego adresata z ksi¥¾ki?" << endl << endl;
         cout << "Wybierz TAK (t) lub NIE (n): ";
 
         cin.clear();
@@ -477,8 +510,8 @@ int potwierdzUsuniecieAdresata (vector <DaneAdresata> &adresaci, int liczbaAdres
             liczbaAdresatow = usunWybranegoAdresata (adresaci, liczbaAdresatow, indeksWyszukanegoAdresata);
             wyczyscPlikTekstowyZAdresatami ();
             zapiszAdresatowWPliku (adresaci, liczbaAdresatow);
-            cout << endl << endl << "Adresat usuniÄ™ty!" << endl;
-            Sleep(1500);
+            cout << endl << endl << "Adresat usuni©ty." << endl;
+            Sleep(1000);
             return liczbaAdresatow;
         case 'n':
         case 'N':
@@ -497,7 +530,7 @@ int modyfikujDaneAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow,
     int IDAdresata, indeksWyszukanegoAdresata;
 
     if (wybranyZnak == '5')
-        cout << "Wpisz ID adresata do usuniÄ™cia: ";
+        cout << "Wpisz ID adresata do usuni©cia: ";
     else if (wybranyZnak == '6')
         cout << "Wpisz ID adresata do edycji: ";
 
@@ -515,49 +548,43 @@ int modyfikujDaneAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow,
     return liczbaAdresatow;
 }
 
-void wyswietlMenuStartowe ()
-{
-    system("cls");
-    cout << "**********************************" << endl;
-    cout << "*        KSIÄ„Å»KA ADRESOWA        *" << endl;
-    cout << "**********************************" << endl << endl;
-    cout << "1. Logowanie" << endl;
-    cout << "2. Rejestracja" << endl;
-    cout << "3. ZakoÅ„cz program" << endl;
-    cout << endl;
-}
-
-void wyswietlMenuZAdresatami ()
-{
-    system("cls");
-    cout << "**********************************" << endl;
-    cout << "*        KSIÄ„Å»KA ADRESOWA        *" << endl;
-    cout << "**********************************" << endl << endl;
-    cout << "1. Dodaj nowego adresata" << endl;
-    cout << "2. Wyszukaj adresata po imieniu" << endl;
-    cout << "3. Wyszukaj adresata po nazwisku" << endl;
-    cout << "4. Lista zapisanych adresatÃ³w" << endl;
-    cout << "5. UsuÅ„ adresata" << endl;
-    cout << "6. Edytuj dane adresata" << endl;
-    cout << "7. ZmieÅ„ hasÅ‚o" << endl;
-    cout << "8. ZakoÅ„cz program" << endl;
-    cout << endl;
-}
-
 int zalogujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
 {
     string wpisanaNazwa, wpisaneHaslo;
-    int idUzytkownika;
 
+    system("cls");
+    wyswietlHeaderMenu ();
+    cout << "Wpisz nazw© u¾ytkownika: ";
+    cin.sync();
+    getline(cin,wpisanaNazwa);
 
+    int i = 0;
+    while (i<liczbaUzytkownikow)
+    {
+        if (uzytkownicy[i].nazwa == wpisanaNazwa)
+        {
+            for (int j=0; j<3; j++)
+            {
+                cout << "Podaj hasˆo (pozostaˆo " << 3-j << " pr¢b): ";
+                cin.sync();
+                getline(cin,wpisaneHaslo);
 
-
-
-
-
-
-
-    return idUzytkownika;
+                if (uzytkownicy[i].haslo == wpisaneHaslo)
+                {
+                    cout << "Zalogowano." << endl;
+                    Sleep (1000);
+                    return uzytkownicy[i].idUzytkownika;
+                }
+            }
+            cout << "Trzykrotnie wpisano bˆ©dne hasˆo. Poczekaj 3 sekundy przed kolejn¥ pr¢b¥." << endl;
+            Sleep (3000);
+            return 0;
+        }
+        i++;
+    }
+    cout << "Nie ma takiego u¾ytkownika." << endl;
+    Sleep(1000);
+    return 0;
 }
 
 int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
@@ -565,10 +592,8 @@ int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
     string nazwa, haslo;
 
     system("cls");
-    cout << "**********************************" << endl;
-    cout << "*        KSIÄ„Å»KA ADRESOWA        *" << endl;
-    cout << "**********************************" << endl << endl;
-    cout << "Wpisz nazwÄ™ uÅ¼ytkownika: ";
+    wyswietlHeaderMenu ();
+    cout << "Wpisz nazw© u¾ytkownika: ";
     cin.sync();
     getline(cin,nazwa);
 
@@ -577,7 +602,7 @@ int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
     {
         if (uzytkownicy[i].nazwa == nazwa)
         {
-            cout << "Taki uÅ¼ytkownik juÅ¼ istnieje. Wpisz innÄ… nazwÄ™ uÅ¼ytkownika: ";
+            cout << "Taki u¾ytkownik ju¾ istnieje. Wpisz inn¥ nazw© u¾ytkownika: ";
             cin.sync();
             getline(cin,nazwa);
             i = 0;
@@ -586,7 +611,7 @@ int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
             i++;
     }
 
-    cout << "Wpisz hasÅ‚o: ";
+    cout << "Wpisz hasˆo: ";
     cin.sync();
     getline (cin,haslo);
 
@@ -598,19 +623,37 @@ int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
 
     wyczyscPlikTekstowyZUzytkownikami ();
     zapiszUzytkownikowWPliku (uzytkownicy, liczbaUzytkownikow);
-    cout << endl << "Konto utworzone" << endl;
+    cout << endl << "Konto utworzone." << endl;
     Sleep(1000);
 
     return liczbaUzytkownikow;
 }
 
-int uruchomObslugeUzytkownikow ()
+void zmienHasloZalogowanegoUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika)
 {
-    vector <DaneUzytkownika> uzytkownicy;
-    int liczbaUzytkownikow = 0;
-    char wybranyZnak;
+    string noweHaslo;
 
-    liczbaUzytkownikow = wczytajUzytkownikowZPliku (uzytkownicy, liczbaUzytkownikow);
+    system("cls");
+    wyswietlHeaderMenu ();
+    cout << "Podaj nowe hasˆo: ";
+    cin.sync();
+    getline (cin,noweHaslo);
+
+    for (int i=0; i<liczbaUzytkownikow; i++)
+    {
+        if (uzytkownicy[i].idUzytkownika == idZalogowanegoUzytkownika)
+            uzytkownicy[i].haslo = noweHaslo;
+    }
+
+    wyczyscPlikTekstowyZUzytkownikami ();
+    zapiszUzytkownikowWPliku (uzytkownicy, liczbaUzytkownikow);
+    cout << endl << "Hasˆo zmienione." << endl;
+    Sleep(1000);
+}
+
+int uruchomObslugeUzytkownikow (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+{
+    char wybranyZnak;
 
     do
     {
@@ -629,16 +672,18 @@ int uruchomObslugeUzytkownikow ()
             liczbaUzytkownikow = zarejestrujUzytkownika (uzytkownicy, liczbaUzytkownikow);
             break;
         case '3':
+            cout << "Do nast©pnego razu!" << endl;
+            Sleep(1000);
             exit (0);
         default:
             cout << "Nie ma takiej opcji w menu!";
-            Sleep(1500);
+            Sleep(1000);
         }
     }
     while (wybranyZnak !=3);
 }
 
-void uruchomKsiazkeAdresowa (int idZalogowanegoUzytkownika)
+int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika)
 {
     vector <DaneAdresata> adresaci;
     int liczbaAdresatow = 0;
@@ -649,10 +694,10 @@ void uruchomKsiazkeAdresowa (int idZalogowanegoUzytkownika)
     do
     {
         wyswietlMenuZAdresatami ();
-
         cin.clear();
         cin.sync();
         wybranyZnak = getch();
+
         switch (wybranyZnak)
         {
         case '1':
@@ -672,17 +717,17 @@ void uruchomKsiazkeAdresowa (int idZalogowanegoUzytkownika)
             liczbaAdresatow = modyfikujDaneAdresata (adresaci, liczbaAdresatow, wybranyZnak);
             break;
         case '7':
-            // zmien haslo
+            zmienHasloZalogowanegoUzytkownika (uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
             break;
         case '8':
             wyczyscPlikTekstowyZAdresatami ();
             zapiszAdresatowWPliku (adresaci, liczbaAdresatow);
-            cout << " * Zapisano w pliku tekstowym! *" << endl;
-            Sleep(1500);
-            idZalogowanegoUzytkownika = 0;
+            cout << " * Zapisano! *" << endl;
+            Sleep(1000);
+            return 0;
         default:
             cout << "Nie ma takiej opcji w menu!";
-            Sleep(1500);
+            Sleep(1000);
         }
     }
     while (wybranyZnak != 8);
@@ -690,14 +735,18 @@ void uruchomKsiazkeAdresowa (int idZalogowanegoUzytkownika)
 
 int main ()
 {
+    vector <DaneUzytkownika> uzytkownicy;
+    int liczbaUzytkownikow = 0;
     int idZalogowanegoUzytkownika = 0;
+
+    liczbaUzytkownikow = wczytajUzytkownikowZPliku (uzytkownicy, liczbaUzytkownikow);
 
     while(1)
     {
         if (idZalogowanegoUzytkownika == 0)
-            idZalogowanegoUzytkownika = uruchomObslugeUzytkownikow ();
+            idZalogowanegoUzytkownika = uruchomObslugeUzytkownikow (uzytkownicy, liczbaUzytkownikow);
         else
-            uruchomKsiazkeAdresowa (idZalogowanegoUzytkownika);
+            idZalogowanegoUzytkownika = uruchomKsiazkeAdresowa (uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
     }
 
     return 0;
