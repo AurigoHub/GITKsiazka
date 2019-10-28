@@ -21,6 +21,7 @@ struct DaneAdresata
 
 void wyswietlHeaderMenu ()
 {
+    system("cls");
     cout << "**********************************" << endl;
     cout << "*        KSI¤½KA ADRESOWA        *" << endl;
     cout << "**********************************" << endl << endl;
@@ -28,7 +29,6 @@ void wyswietlHeaderMenu ()
 
 void wyswietlMenuStartowe ()
 {
-    system("cls");
     wyswietlHeaderMenu ();
     cout << "1. Logowanie" << endl;
     cout << "2. Rejestracja" << endl;
@@ -38,8 +38,6 @@ void wyswietlMenuStartowe ()
 
 void wyswietlMenuZAdresatami ()
 {
-    system("cls");
-    wyswietlHeaderMenu ();
     cout << "1. Dodaj nowego adresata" << endl;
     cout << "2. Wyszukaj adresata po imieniu" << endl;
     cout << "3. Wyszukaj adresata po nazwisku" << endl;
@@ -63,7 +61,6 @@ void wyswietlDaneAdresata (vector <DaneAdresata> &adresaci, int i)
 
 void wyswietlMenuEdycji (vector <DaneAdresata> &adresaci, int indeksWyszukanegoAdresata)
 {
-    system("cls");
     wyswietlHeaderMenu();
     cout << "Aktualne dane wybranego adresata: " << endl << endl;
     wyswietlDaneAdresata (adresaci, indeksWyszukanegoAdresata);
@@ -93,10 +90,11 @@ void wczytajSegmentZLiniiTekstuSpisuUzytkownikow (vector <DaneUzytkownika> &uzyt
     }
 }
 
-int wczytajUzytkownikowZPliku (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+void wczytajUzytkownikowZPliku (vector <DaneUzytkownika> &uzytkownicy)
 {
     fstream spisUzytkownikow;
     string liniaTekstuSpisuUzytkownikow;
+    int liczbaUzytkownikow = 0;
 
     spisUzytkownikow.open ("Uzytkownicy.txt", ios::in);
     if (spisUzytkownikow.good() == true)
@@ -117,8 +115,6 @@ int wczytajUzytkownikowZPliku (vector <DaneUzytkownika> &uzytkownicy, int liczba
         }
     }
     spisUzytkownikow.close();
-
-    return liczbaUzytkownikow;
 }
 
 void wczytajSegmentZLiniiTekstuSpisuAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
@@ -188,9 +184,10 @@ void wyczyscPlikTekstowyZAdresatami ()
     ksiazkaAdresowa.close();
 }
 
-void zapiszUzytkownikowWPliku (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+void zapiszUzytkownikowWPliku (vector <DaneUzytkownika> &uzytkownicy)
 {
     fstream spisUzytkownikow;
+    int liczbaUzytkownikow = uzytkownicy.size();
 
     spisUzytkownikow.open("Uzytkownicy.txt", ios::out|ios::app);
     if (spisUzytkownikow.good() == true)
@@ -492,7 +489,6 @@ int potwierdzUsuniecieAdresata (vector <DaneAdresata> &adresaci, int liczbaAdres
 
     do
     {
-        system("cls");
         wyswietlHeaderMenu();
         cout << "Aktualne dane wybranego adresata: " << endl << endl;
         wyswietlDaneAdresata (adresaci, indeksWyszukanegoAdresata);
@@ -548,18 +544,17 @@ int modyfikujDaneAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow,
     return liczbaAdresatow;
 }
 
-int zalogujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+int zalogujUzytkownika (vector <DaneUzytkownika> &uzytkownicy)
 {
     string wpisanaNazwa, wpisaneHaslo;
+    int liczbaUzytkownikow = uzytkownicy.size();
 
-    system("cls");
     wyswietlHeaderMenu ();
     cout << "Wpisz nazw© u¾ytkownika: ";
     cin.sync();
     getline(cin,wpisanaNazwa);
 
-    int i = 0;
-    while (i<liczbaUzytkownikow)
+    for (int i=0; i<liczbaUzytkownikow; i++)
     {
         if (uzytkownicy[i].nazwa == wpisanaNazwa)
         {
@@ -571,27 +566,27 @@ int zalogujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkow
 
                 if (uzytkownicy[i].haslo == wpisaneHaslo)
                 {
-                    cout << "Zalogowano." << endl;
+                    cout << endl << "Zalogowano." << endl;
                     Sleep (1000);
                     return uzytkownicy[i].idUzytkownika;
                 }
             }
-            cout << "Trzykrotnie wpisano bˆ©dne hasˆo. Poczekaj 3 sekundy przed kolejn¥ pr¢b¥." << endl;
+            cout << endl << "Trzykrotnie wpisano bˆ©dne hasˆo. Poczekaj 3 sekundy przed kolejn¥ pr¢b¥." << endl;
             Sleep (3000);
             return 0;
         }
-        i++;
     }
-    cout << "Nie ma takiego u¾ytkownika." << endl;
-    Sleep(1000);
+
+    cout << endl << "Nie ma takiego u¾ytkownika." << endl;
+    Sleep(1500);
     return 0;
 }
 
-int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+void zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy)
 {
     string nazwa, haslo;
+    int liczbaUzytkownikow = uzytkownicy.size();
 
-    system("cls");
     wyswietlHeaderMenu ();
     cout << "Wpisz nazw© u¾ytkownika: ";
     cin.sync();
@@ -619,21 +614,18 @@ int zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
     uzytkownicy[liczbaUzytkownikow].nazwa = nazwa;
     uzytkownicy[liczbaUzytkownikow].haslo = haslo;
     uzytkownicy[liczbaUzytkownikow].idUzytkownika = liczbaUzytkownikow + 1;
-    liczbaUzytkownikow++;
 
     wyczyscPlikTekstowyZUzytkownikami ();
-    zapiszUzytkownikowWPliku (uzytkownicy, liczbaUzytkownikow);
+    zapiszUzytkownikowWPliku (uzytkownicy);
     cout << endl << "Konto utworzone." << endl;
     Sleep(1000);
-
-    return liczbaUzytkownikow;
 }
 
-void zmienHasloZalogowanegoUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika)
+void zmienHasloZalogowanegoUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int idZalogowanegoUzytkownika) ///////////////
 {
     string noweHaslo;
+    int liczbaUzytkownikow = uzytkownicy.size();
 
-    system("cls");
     wyswietlHeaderMenu ();
     cout << "Podaj nowe hasˆo: ";
     cin.sync();
@@ -646,19 +638,18 @@ void zmienHasloZalogowanegoUzytkownika (vector <DaneUzytkownika> &uzytkownicy, i
     }
 
     wyczyscPlikTekstowyZUzytkownikami ();
-    zapiszUzytkownikowWPliku (uzytkownicy, liczbaUzytkownikow);
+    zapiszUzytkownikowWPliku (uzytkownicy);
     cout << endl << "Hasˆo zmienione." << endl;
     Sleep(1000);
 }
 
-int uruchomObslugeUzytkownikow (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow)
+int uruchomObslugeUzytkownikow (vector <DaneUzytkownika> &uzytkownicy)
 {
     char wybranyZnak;
 
     do
     {
         wyswietlMenuStartowe ();
-
         cin.clear();
         cin.sync();
         wybranyZnak = getch();
@@ -666,10 +657,10 @@ int uruchomObslugeUzytkownikow (vector <DaneUzytkownika> &uzytkownicy, int liczb
         switch (wybranyZnak)
         {
         case '1':
-            return zalogujUzytkownika (uzytkownicy, liczbaUzytkownikow);
+            return zalogujUzytkownika (uzytkownicy);
             break;
         case '2':
-            liczbaUzytkownikow = zarejestrujUzytkownika (uzytkownicy, liczbaUzytkownikow);
+            zarejestrujUzytkownika (uzytkownicy);
             break;
         case '3':
             cout << "Do nast©pnego razu!" << endl;
@@ -683,7 +674,7 @@ int uruchomObslugeUzytkownikow (vector <DaneUzytkownika> &uzytkownicy, int liczb
     while (wybranyZnak !=3);
 }
 
-int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika)
+int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int idZalogowanegoUzytkownika)
 {
     vector <DaneAdresata> adresaci;
     int liczbaAdresatow = 0;
@@ -693,7 +684,10 @@ int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
 
     do
     {
+        wyswietlHeaderMenu();
+        cout << "Witaj, " << uzytkownicy[idZalogowanegoUzytkownika-1].nazwa << ". Wybierz opcj©:" << endl << endl;
         wyswietlMenuZAdresatami ();
+
         cin.clear();
         cin.sync();
         wybranyZnak = getch();
@@ -717,13 +711,12 @@ int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
             liczbaAdresatow = modyfikujDaneAdresata (adresaci, liczbaAdresatow, wybranyZnak);
             break;
         case '7':
-            zmienHasloZalogowanegoUzytkownika (uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
+            zmienHasloZalogowanegoUzytkownika (uzytkownicy, idZalogowanegoUzytkownika);
             break;
         case '8':
-            wyczyscPlikTekstowyZAdresatami ();
-            zapiszAdresatowWPliku (adresaci, liczbaAdresatow);
             cout << " * Zapisano! *" << endl;
             Sleep(1000);
+
             return 0;
         default:
             cout << "Nie ma takiej opcji w menu!";
@@ -736,17 +729,15 @@ int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int liczbaUzy
 int main ()
 {
     vector <DaneUzytkownika> uzytkownicy;
-    int liczbaUzytkownikow = 0;
     int idZalogowanegoUzytkownika = 0;
-
-    liczbaUzytkownikow = wczytajUzytkownikowZPliku (uzytkownicy, liczbaUzytkownikow);
+    wczytajUzytkownikowZPliku (uzytkownicy);
 
     while(1)
     {
         if (idZalogowanegoUzytkownika == 0)
-            idZalogowanegoUzytkownika = uruchomObslugeUzytkownikow (uzytkownicy, liczbaUzytkownikow);
+            idZalogowanegoUzytkownika = uruchomObslugeUzytkownikow (uzytkownicy);
         else
-            idZalogowanegoUzytkownika = uruchomKsiazkeAdresowa (uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
+            idZalogowanegoUzytkownika = uruchomKsiazkeAdresowa (uzytkownicy, idZalogowanegoUzytkownika);
     }
 
     return 0;
