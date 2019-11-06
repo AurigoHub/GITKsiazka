@@ -15,7 +15,7 @@ struct DaneUzytkownika
 
 struct DaneAdresata
 {
-    int idAdresata;
+    int idAdresata, wlascicielWpisu;
     string imie, nazwisko, adres, telefon, email;
 };
 
@@ -125,18 +125,21 @@ void wczytajSegmentZLiniiTekstuSpisuAdresatow (vector <DaneAdresata> &adresaci, 
         adresaci[liczbaAdresatow].idAdresata = atoi(segmentDanychAdresata.c_str());
         break;
     case 2:
-        adresaci[liczbaAdresatow].imie = segmentDanychAdresata;
+        adresaci[liczbaAdresatow].wlascicielWpisu = atoi(segmentDanychAdresata.c_str());
         break;
     case 3:
-        adresaci[liczbaAdresatow].nazwisko = segmentDanychAdresata;
+        adresaci[liczbaAdresatow].imie = segmentDanychAdresata;
         break;
     case 4:
-        adresaci[liczbaAdresatow].adres = segmentDanychAdresata;
+        adresaci[liczbaAdresatow].nazwisko = segmentDanychAdresata;
         break;
     case 5:
-        adresaci[liczbaAdresatow].telefon = segmentDanychAdresata;
+        adresaci[liczbaAdresatow].adres = segmentDanychAdresata;
         break;
     case 6:
+        adresaci[liczbaAdresatow].telefon = segmentDanychAdresata;
+        break;
+    case 7:
         adresaci[liczbaAdresatow].email = segmentDanychAdresata;
         break;
     }
@@ -217,6 +220,7 @@ void zapiszAdresatowWPliku (vector <DaneAdresata> &adresaci, int liczbaAdresatow
         for (int i=0; i<liczbaAdresatow; i++)
         {
             ksiazkaAdresowa << adresaci[i].idAdresata << '|';
+            ksiazkaAdresowa << adresaci[i].wlascicielWpisu << '|';
             ksiazkaAdresowa << adresaci[i].imie << '|';
             ksiazkaAdresowa << adresaci[i].nazwisko << '|';
             ksiazkaAdresowa << adresaci[i].adres << '|';
@@ -250,7 +254,7 @@ int wyznaczIDNowegoAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresato
         return (adresaci[liczbaAdresatow-1].idAdresata + inkrementacjaID);
 }
 
-int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
+int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
 {
     string imie, nazwisko, adres, telefon, email;
     int indeksNowegoAdresata = 0;
@@ -280,6 +284,7 @@ int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow
     adresaci[indeksNowegoAdresata].telefon = telefon;
     adresaci[indeksNowegoAdresata].email = email;
     adresaci[indeksNowegoAdresata].idAdresata = IDNowegoAdresata;
+    adresaci[indeksNowegoAdresata].wlascicielWpisu = idZalogowanegoUzytkownika;
     liczbaAdresatow++;
 
     wyczyscPlikTekstowyZAdresatami ();
@@ -290,8 +295,10 @@ int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow
     return liczbaAdresatow;
 }
 
-void wyswietlWszystkichAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
+void wyswietlWszystkichAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
 {
+    int liczbaWynikow = 0;
+
     if (liczbaAdresatow == 0)
     {
         cout << "Ksi¥¾ka adresowa jest pusta." << endl << endl;
@@ -299,17 +306,24 @@ void wyswietlWszystkichAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdr
     }
     else
     {
-        cout << "Liczba adresat¢w zapisanych w ksi¥¾ce adresowej: " << liczbaAdresatow << endl << endl;
+        for (int i=0; i<liczbaAdresatow; i++)
+        {
+            if (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika)
+                liczbaWynikow ++;
+        }
+
+        cout << "Liczba adresat¢w zapisanych w ksi¥¾ce adresowej: " << liczbaWynikow << endl << endl;
 
         for (int i=0; i<liczbaAdresatow; i++)
         {
-            wyswietlDaneAdresata (adresaci, i);
+            if (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika)
+                wyswietlDaneAdresata (adresaci, i);
         }
         system("pause");
     }
 }
 
-int wyszukajID (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int IDAdresata)
+int wyszukajID (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int IDAdresata, int idZalogowanegoUzytkownika)
 {
     const int NIE_ZNALEZIONO_WYNIKOW = -1;
     int indeksWyszukanegoAdresata;
@@ -317,7 +331,7 @@ int wyszukajID (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int IDAdre
 
     for (int i=0; i<liczbaAdresatow; i++)
     {
-        if (IDAdresata == adresaci[i].idAdresata)
+        if ((adresaci[i].idAdresata == IDAdresata) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
         {
             indeksWyszukanegoAdresata = i;
             liczbaWynikow ++;
@@ -334,7 +348,7 @@ int wyszukajID (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int IDAdre
         return indeksWyszukanegoAdresata;
 }
 
-void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
+void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
 {
     string szukaneImie;
     int liczbaWynikow = 0;
@@ -345,7 +359,7 @@ void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
 
     for (int i=0; i<liczbaAdresatow; i++)
     {
-        if (szukaneImie == adresaci[i].imie)
+        if ((adresaci[i].imie == szukaneImie) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
             liczbaWynikow ++;
     }
 
@@ -357,14 +371,14 @@ void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
         cout << endl << "Znaleziono " << liczbaWynikow << " adresat¢w w ksi¥¾ce:" << endl << endl;
         for (int i=0; i<liczbaAdresatow; i++)
         {
-            if (szukaneImie == adresaci[i].imie)
+            if ((adresaci[i].imie == szukaneImie) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
                 wyswietlDaneAdresata (adresaci, i);
         }
     }
     system("pause");
 }
 
-void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
+void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
 {
     string szukaneNazwisko;
     int liczbaWynikow = 0;
@@ -375,7 +389,7 @@ void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
 
     for (int i=0; i<liczbaAdresatow; i++)
     {
-        if (szukaneNazwisko == adresaci[i].nazwisko)
+        if ((adresaci[i].nazwisko == szukaneNazwisko) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
             liczbaWynikow ++;
     }
 
@@ -387,7 +401,7 @@ void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
         cout << endl << "Znaleziono " << liczbaWynikow << " adresat¢w w ksi¥¾ce:" << endl << endl;
         for (int i=0; i<liczbaAdresatow; i++)
         {
-            if (szukaneNazwisko == adresaci[i].nazwisko)
+            if ((adresaci[i].nazwisko == szukaneNazwisko) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
                 wyswietlDaneAdresata (adresaci, i);
         }
     }
@@ -521,7 +535,7 @@ int potwierdzUsuniecieAdresata (vector <DaneAdresata> &adresaci, int liczbaAdres
     while (wybranyZnakWMenuUsuwania != ('n' | 'N'));
 }
 
-int modyfikujDaneAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow, char wybranyZnak)
+int modyfikujDaneAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow, char wybranyZnak, int idZalogowanegoUzytkownika)
 {
     int IDAdresata, indeksWyszukanegoAdresata;
 
@@ -532,7 +546,7 @@ int modyfikujDaneAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresatow,
 
     cin >> IDAdresata;
 
-    indeksWyszukanegoAdresata = wyszukajID (adresaci, liczbaAdresatow, IDAdresata);
+    indeksWyszukanegoAdresata = wyszukajID (adresaci, liczbaAdresatow, IDAdresata, idZalogowanegoUzytkownika);
 
     if (indeksWyszukanegoAdresata >= 0)
     {
@@ -621,7 +635,7 @@ void zarejestrujUzytkownika (vector <DaneUzytkownika> &uzytkownicy)
     Sleep(1000);
 }
 
-void zmienHasloZalogowanegoUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int idZalogowanegoUzytkownika) ///////////////
+void zmienHasloZalogowanegoUzytkownika (vector <DaneUzytkownika> &uzytkownicy, int idZalogowanegoUzytkownika)
 {
     string noweHaslo;
     int liczbaUzytkownikow = uzytkownicy.size();
@@ -695,20 +709,20 @@ int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int idZalogow
         switch (wybranyZnak)
         {
         case '1':
-            liczbaAdresatow = dodajAdresataDoKsiazki (adresaci, liczbaAdresatow);
+            liczbaAdresatow = dodajAdresataDoKsiazki (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
             break;
         case '2':
-            wyszukajImie (adresaci, liczbaAdresatow);
+            wyszukajImie (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
             break;
         case '3':
-            wyszukajNazwisko (adresaci, liczbaAdresatow);
+            wyszukajNazwisko (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
             break;
         case '4':
-            wyswietlWszystkichAdresatow (adresaci, liczbaAdresatow);
+            wyswietlWszystkichAdresatow (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
             break;
         case '5':
         case '6':
-            liczbaAdresatow = modyfikujDaneAdresata (adresaci, liczbaAdresatow, wybranyZnak);
+            liczbaAdresatow = modyfikujDaneAdresata (adresaci, liczbaAdresatow, wybranyZnak, idZalogowanegoUzytkownika);
             break;
         case '7':
             zmienHasloZalogowanegoUzytkownika (uzytkownicy, idZalogowanegoUzytkownika);
