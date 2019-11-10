@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
@@ -6,6 +7,11 @@
 #include <vector>
 
 using namespace std;
+
+struct AnalizaPlikuTekstowego
+{
+    int idOstatniegoAdresata, liczbaAdresatow;
+};
 
 struct DaneUzytkownika
 {
@@ -117,60 +123,96 @@ void wczytajUzytkownikowZPliku (vector <DaneUzytkownika> &uzytkownicy)
     spisUzytkownikow.close();
 }
 
-void wczytajSegmentZLiniiTekstuSpisuAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
+/*
+void sprawdzPierwszeDwaSegmentyLinii (DaneAdresata &buforAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
 {
     switch (numerSegmentuWLiniiTekstu)
     {
     case 1:
-        adresaci[liczbaAdresatow].idAdresata = atoi(segmentDanychAdresata.c_str());
+        buforAdresatow.idAdresata = atoi(segmentDanychAdresata.c_str());
         break;
     case 2:
-        adresaci[liczbaAdresatow].wlascicielWpisu = atoi(segmentDanychAdresata.c_str());
+        buforAdresatow.wlascicielWpisu = atoi(segmentDanychAdresata.c_str());
+        break;
+    }
+}
+*/
+
+
+void wczytajSegmentZLiniiTekstuSpisuAdresatow (DaneAdresata &buforAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
+{
+    switch (numerSegmentuWLiniiTekstu)
+    {
+    case 1:
+        buforAdresatow.idAdresata = atoi(segmentDanychAdresata.c_str());
+        break;
+    case 2:
+        buforAdresatow.wlascicielWpisu = atoi(segmentDanychAdresata.c_str());
         break;
     case 3:
-        adresaci[liczbaAdresatow].imie = segmentDanychAdresata;
+        buforAdresatow.imie = segmentDanychAdresata;
         break;
     case 4:
-        adresaci[liczbaAdresatow].nazwisko = segmentDanychAdresata;
+        buforAdresatow.nazwisko = segmentDanychAdresata;
         break;
     case 5:
-        adresaci[liczbaAdresatow].adres = segmentDanychAdresata;
+        buforAdresatow.adres = segmentDanychAdresata;
         break;
     case 6:
-        adresaci[liczbaAdresatow].telefon = segmentDanychAdresata;
+        buforAdresatow.telefon = segmentDanychAdresata;
         break;
     case 7:
-        adresaci[liczbaAdresatow].email = segmentDanychAdresata;
+        buforAdresatow.email = segmentDanychAdresata;
         break;
     }
 }
 
-int wczytajAdresatowZPliku (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
+void skopiujBuforDoWektoraAdresatow (DaneAdresata &buforAdresatow, vector <DaneAdresata> &adresaci, int liczbaAdresatow)
+{
+    adresaci.push_back(DaneAdresata());
+    adresaci[liczbaAdresatow].idAdresata = buforAdresatow.idAdresata;
+    adresaci[liczbaAdresatow].wlascicielWpisu = buforAdresatow.wlascicielWpisu;
+    adresaci[liczbaAdresatow].imie = buforAdresatow.imie;
+    adresaci[liczbaAdresatow].nazwisko = buforAdresatow.nazwisko;
+    adresaci[liczbaAdresatow].adres = buforAdresatow.adres;
+    adresaci[liczbaAdresatow].telefon = buforAdresatow.telefon;
+    adresaci[liczbaAdresatow].email = buforAdresatow.email;
+}
+
+AnalizaPlikuTekstowego wczytajAdresatowZPliku (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
 {
     fstream ksiazkaAdresowa;
     string liniaTekstuSpisuAdresatow;
+    DaneAdresata buforAdresatow;
+    AnalizaPlikuTekstowego wynikAnalizyPlikuTekstowego;
 
     ksiazkaAdresowa.open ("Adresaci.txt", ios::in);
     if (ksiazkaAdresowa.good() == true)
     {
         while (getline(ksiazkaAdresowa,liniaTekstuSpisuAdresatow))
         {
-            adresaci.push_back(DaneAdresata());
             stringstream ss (liniaTekstuSpisuAdresatow);
             string segmentDanychAdresata;
             int numerSegmentuWLiniiTekstu = 1;
 
             while (getline(ss, segmentDanychAdresata, '|'))
             {
-                wczytajSegmentZLiniiTekstuSpisuAdresatow (adresaci, liczbaAdresatow, segmentDanychAdresata, numerSegmentuWLiniiTekstu);
+                wczytajSegmentZLiniiTekstuSpisuAdresatow (buforAdresatow, segmentDanychAdresata, numerSegmentuWLiniiTekstu);
                 numerSegmentuWLiniiTekstu ++;
             }
-            liczbaAdresatow ++;
+            wynikAnalizyPlikuTekstowego.idOstatniegoAdresata = buforAdresatow.idAdresata;
+
+            if (buforAdresatow.wlascicielWpisu == idZalogowanegoUzytkownika)
+            {
+                skopiujBuforDoWektoraAdresatow (buforAdresatow, adresaci, liczbaAdresatow);
+                liczbaAdresatow ++;
+            }
         }
+        wynikAnalizyPlikuTekstowego.liczbaAdresatow = liczbaAdresatow;
     }
     ksiazkaAdresowa.close();
 
-    return liczbaAdresatow;
+    return wynikAnalizyPlikuTekstowego;
 }
 
 void wyczyscPlikTekstowyZUzytkownikami ()
@@ -254,7 +296,7 @@ int wyznaczIDNowegoAdresata (vector <DaneAdresata> &adresaci, int liczbaAdresato
         return (adresaci[liczbaAdresatow-1].idAdresata + inkrementacjaID);
 }
 
-int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
+int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika, int idOstatniegoAdresataWKsiazce) // WIP -------------
 {
     string imie, nazwisko, adres, telefon, email;
     int indeksNowegoAdresata = 0;
@@ -295,10 +337,8 @@ int dodajAdresataDoKsiazki (vector <DaneAdresata> &adresaci, int liczbaAdresatow
     return liczbaAdresatow;
 }
 
-void wyswietlWszystkichAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
+void wyswietlWszystkichAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
 {
-    int liczbaWynikow = 0;
-
     if (liczbaAdresatow == 0)
     {
         cout << "Ksi¥¾ka adresowa jest pusta." << endl << endl;
@@ -306,18 +346,11 @@ void wyswietlWszystkichAdresatow (vector <DaneAdresata> &adresaci, int liczbaAdr
     }
     else
     {
-        for (int i=0; i<liczbaAdresatow; i++)
-        {
-            if (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika)
-                liczbaWynikow ++;
-        }
-
-        cout << "Liczba adresat¢w zapisanych w ksi¥¾ce adresowej: " << liczbaWynikow << endl << endl;
+        cout << "Liczba adresat¢w zapisanych w ksi¥¾ce adresowej: " << liczbaAdresatow << endl << endl;
 
         for (int i=0; i<liczbaAdresatow; i++)
         {
-            if (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika)
-                wyswietlDaneAdresata (adresaci, i);
+            wyswietlDaneAdresata (adresaci, i);
         }
         system("pause");
     }
@@ -348,7 +381,7 @@ int wyszukajID (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int IDAdre
         return indeksWyszukanegoAdresata;
 }
 
-void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
+void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
 {
     string szukaneImie;
     int liczbaWynikow = 0;
@@ -359,26 +392,25 @@ void wyszukajImie (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZ
 
     for (int i=0; i<liczbaAdresatow; i++)
     {
-        if ((adresaci[i].imie == szukaneImie) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
+        if (adresaci[i].imie == szukaneImie)
             liczbaWynikow ++;
     }
 
     if (liczbaWynikow == 0)
         cout << endl << "Nie znaleziono ¾adnych adresat¢w." << endl << endl;
-
     else
     {
         cout << endl << "Znaleziono " << liczbaWynikow << " adresat¢w w ksi¥¾ce:" << endl << endl;
         for (int i=0; i<liczbaAdresatow; i++)
         {
-            if ((adresaci[i].imie == szukaneImie) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
+            if (adresaci[i].imie == szukaneImie)
                 wyswietlDaneAdresata (adresaci, i);
         }
     }
     system("pause");
 }
 
-void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int idZalogowanegoUzytkownika)
+void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow)
 {
     string szukaneNazwisko;
     int liczbaWynikow = 0;
@@ -389,19 +421,18 @@ void wyszukajNazwisko (vector <DaneAdresata> &adresaci, int liczbaAdresatow, int
 
     for (int i=0; i<liczbaAdresatow; i++)
     {
-        if ((adresaci[i].nazwisko == szukaneNazwisko) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
+        if (adresaci[i].nazwisko == szukaneNazwisko)
             liczbaWynikow ++;
     }
 
     if (liczbaWynikow == 0)
         cout << endl << "Nie znaleziono ¾adnych adresat¢w." << endl << endl;
-
     else
     {
         cout << endl << "Znaleziono " << liczbaWynikow << " adresat¢w w ksi¥¾ce:" << endl << endl;
         for (int i=0; i<liczbaAdresatow; i++)
         {
-            if ((adresaci[i].nazwisko == szukaneNazwisko) && (adresaci[i].wlascicielWpisu == idZalogowanegoUzytkownika))
+            if (adresaci[i].nazwisko == szukaneNazwisko)
                 wyswietlDaneAdresata (adresaci, i);
         }
     }
@@ -691,10 +722,13 @@ int uruchomObslugeUzytkownikow (vector <DaneUzytkownika> &uzytkownicy)
 int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int idZalogowanegoUzytkownika)
 {
     vector <DaneAdresata> adresaci;
-    int liczbaAdresatow = 0;
+    int liczbaAdresatow = 0, idOstatniegoAdresataWKsiazce = 0;
     char wybranyZnak;
+    AnalizaPlikuTekstowego wynikAnalizyPlikuTekstowego;
 
-    liczbaAdresatow = wczytajAdresatowZPliku (adresaci, liczbaAdresatow);
+    wynikAnalizyPlikuTekstowego = wczytajAdresatowZPliku (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika); // done!
+    liczbaAdresatow = wynikAnalizyPlikuTekstowego.liczbaAdresatow; // done!
+    idOstatniegoAdresataWKsiazce = wynikAnalizyPlikuTekstowego.idOstatniegoAdresata; // done!
 
     do
     {
@@ -709,28 +743,30 @@ int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int idZalogow
         switch (wybranyZnak)
         {
         case '1':
-            liczbaAdresatow = dodajAdresataDoKsiazki (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
+            liczbaAdresatow = dodajAdresataDoKsiazki (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika, idOstatniegoAdresataWKsiazce);  // WIP  ---------------------
+            // dodac funkcje analizujaca idOstatniego wpisu (ale nie z pliku)
             break;
         case '2':
-            wyszukajImie (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
+            wyszukajImie (adresaci, liczbaAdresatow); // done!
             break;
         case '3':
-            wyszukajNazwisko (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
+            wyszukajNazwisko (adresaci, liczbaAdresatow); // done!
             break;
         case '4':
-            wyswietlWszystkichAdresatow (adresaci, liczbaAdresatow, idZalogowanegoUzytkownika);
+            wyswietlWszystkichAdresatow (adresaci, liczbaAdresatow); // done!
             break;
         case '5':
         case '6':
             liczbaAdresatow = modyfikujDaneAdresata (adresaci, liczbaAdresatow, wybranyZnak, idZalogowanegoUzytkownika);
+            // dodac funkcje analizujaca idOstatniego wpisu (ale nie z pliku)
             break;
         case '7':
-            zmienHasloZalogowanegoUzytkownika (uzytkownicy, idZalogowanegoUzytkownika);
+            zmienHasloZalogowanegoUzytkownika (uzytkownicy, idZalogowanegoUzytkownika); // done!
             break;
         case '8':
-            cout << " * Zapisano! *" << endl;
+            adresaci.clear();
+            cout << " * Wylogowano! *" << endl;
             Sleep(1000);
-
             return 0;
         default:
             cout << "Nie ma takiej opcji w menu!";
