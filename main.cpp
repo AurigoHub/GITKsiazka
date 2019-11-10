@@ -123,8 +123,7 @@ void wczytajUzytkownikowZPliku (vector <DaneUzytkownika> &uzytkownicy)
     spisUzytkownikow.close();
 }
 
-/*
-void sprawdzPierwszeDwaSegmentyLinii (DaneAdresata &buforAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
+void wczytajPierwszeDwaSegmentyLinii (DaneAdresata &buforAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
 {
     switch (numerSegmentuWLiniiTekstu)
     {
@@ -136,19 +135,11 @@ void sprawdzPierwszeDwaSegmentyLinii (DaneAdresata &buforAdresatow, string segme
         break;
     }
 }
-*/
 
-
-void wczytajSegmentZLiniiTekstuSpisuAdresatow (DaneAdresata &buforAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
+void  wczytajPozostaleSegmentyLinii (DaneAdresata &buforAdresatow, string segmentDanychAdresata, int numerSegmentuWLiniiTekstu)
 {
     switch (numerSegmentuWLiniiTekstu)
     {
-    case 1:
-        buforAdresatow.idAdresata = atoi(segmentDanychAdresata.c_str());
-        break;
-    case 2:
-        buforAdresatow.wlascicielWpisu = atoi(segmentDanychAdresata.c_str());
-        break;
     case 3:
         buforAdresatow.imie = segmentDanychAdresata;
         break;
@@ -184,6 +175,7 @@ AnalizaPlikuTekstowego wczytajAdresatowZPliku (vector <DaneAdresata> &adresaci, 
     fstream ksiazkaAdresowa;
     string liniaTekstuSpisuAdresatow;
     DaneAdresata buforAdresatow;
+    buforAdresatow.wlascicielWpisu = 0;
     AnalizaPlikuTekstowego wynikAnalizyPlikuTekstowego;
 
     ksiazkaAdresowa.open ("Adresaci.txt", ios::in);
@@ -197,11 +189,20 @@ AnalizaPlikuTekstowego wczytajAdresatowZPliku (vector <DaneAdresata> &adresaci, 
 
             while (getline(ss, segmentDanychAdresata, '|'))
             {
-                wczytajSegmentZLiniiTekstuSpisuAdresatow (buforAdresatow, segmentDanychAdresata, numerSegmentuWLiniiTekstu);
+                if (numerSegmentuWLiniiTekstu <= 2)
+                {
+                    wczytajPierwszeDwaSegmentyLinii (buforAdresatow, segmentDanychAdresata, numerSegmentuWLiniiTekstu);
+                    if ((numerSegmentuWLiniiTekstu == 2) && (buforAdresatow.wlascicielWpisu != idZalogowanegoUzytkownika))
+                        break;
+                }
+                if ((numerSegmentuWLiniiTekstu > 2) || (buforAdresatow.wlascicielWpisu == idZalogowanegoUzytkownika))
+                {
+                    wczytajPozostaleSegmentyLinii (buforAdresatow, segmentDanychAdresata, numerSegmentuWLiniiTekstu);
+                }
                 numerSegmentuWLiniiTekstu ++;
             }
-            wynikAnalizyPlikuTekstowego.idOstatniegoAdresata = buforAdresatow.idAdresata;
 
+            wynikAnalizyPlikuTekstowego.idOstatniegoAdresata = buforAdresatow.idAdresata;
             if (buforAdresatow.wlascicielWpisu == idZalogowanegoUzytkownika)
             {
                 skopiujBuforDoWektoraAdresatow (buforAdresatow, adresaci, liczbaAdresatow);
@@ -735,6 +736,8 @@ int uruchomKsiazkeAdresowa (vector <DaneUzytkownika> &uzytkownicy, int idZalogow
         wyswietlHeaderMenu();
         cout << "Witaj, " << uzytkownicy[idZalogowanegoUzytkownika-1].nazwa << ". Wybierz opcj©:" << endl << endl;
         wyswietlMenuZAdresatami ();
+        cout << endl << "liczba wczytanych adresatow: " << liczbaAdresatow << endl; ///////////////////////////////////////////
+        cout << "id ostatniego adresata: " << idOstatniegoAdresataWKsiazce << endl; /////////////////////////////////////////
 
         cin.clear();
         cin.sync();
